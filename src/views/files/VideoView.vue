@@ -49,8 +49,7 @@ import {addNav_group, getNav_group} from "@/api/dataKnowledgeapi";
 import {infoData} from '@/utils/infoData'
 import ModpagingModule from "@/components/common/ModpagingModule.vue";
 import AddButton from "@/components/common/AddButton.vue";
-import {ElMessage, ElMessageBox} from 'element-plus'
-
+import { ElMessage, ElMessageBox } from 'element-plus'
 const total = ref(0)
 const navList = ref([])
 
@@ -61,15 +60,15 @@ const add = () => {
         inputPattern: /^.+$| /,
         inputErrorMessage: '导航目录不能为空！',
     })
-        .then(({value}) => {
+        .then(({ value }) => {
             addNav_group({
-                title: value,
-                tag: '导航目录',
-                status: 1
-            }).then(res => {
+                title:value,
+                tag:'导航目录',
+                status:1
+            }).then(res=>{
                 ElMessage({
                     type: 'success',
-                    message: res.data.msg,
+                    message: res.msg,
                 })
                 getList()
             })

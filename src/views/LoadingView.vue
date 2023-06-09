@@ -8,7 +8,6 @@ import { useRouter } from "vue-router"
 
 const globalStore = useLoginStore(pinia)
 const router = useRouter()
-
 watchEffect(() => {
     if (globalStore.routeReady) {
         router.push(router.currentRoute.value.fullPath)
@@ -16,8 +15,7 @@ watchEffect(() => {
 })
 
 onMounted(() => {
-    console.log("loading")
-    console.log(router.getRoutes())
+    console.log()
 })
 </script>
 

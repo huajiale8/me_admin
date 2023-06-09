@@ -20,7 +20,7 @@
                 :unique-opened="true"
                 :default-active="store.currentRoute"
                 :collapse-transition="false">
-                <menu-vertical :menus="store1.navMenu"/>
+                <menu-vertical :menus="store1.getNavMenu()"/>
             </el-menu>
         </el-aside>
     </el-card>
@@ -31,14 +31,22 @@ import {useLoginStore} from "@/stores/login";
 import {onMounted} from 'vue'
 import MenuVertical from "@/components/home/MenuVertical.vue";
 import pinia from "@/utils/pinia";
+import {useRoute,onBeforeRouteUpdate} from "vue-router";
 
+const route = useRoute()
 const store = asideStore(pinia)
 const store1 = useLoginStore(pinia)
 
 onMounted(() => {
     console.log(store1.getNavMenu())
+    currentRouteActive(route)
 })
-
+const currentRouteActive = (currentRoute: any) => {
+    store.currentRoute = currentRoute.path
+}
+onBeforeRouteUpdate((to:any) => {
+    currentRouteActive(to)
+})
 </script>
 
 <style lang="scss" scoped>

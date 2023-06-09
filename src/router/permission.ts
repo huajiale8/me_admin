@@ -19,12 +19,7 @@ router.beforeEach((to,from,next)=>{
     state.currentRoute = to.path;
     const token = store.getToken()
     if(token){ //判断token是否存在
-        if(to.path === '/login'){
-            // 如果token已经存在还去登录页面的话，让他去首页
-            next('/')
-        }else {
-            next()
-        }
+       next()
     }else {
         // 如果没有token要去白名单
         if(wgiteList.includes(to.path)){

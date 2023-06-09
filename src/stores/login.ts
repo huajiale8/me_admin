@@ -6,6 +6,7 @@ export const useLoginStore = defineStore(
     () => {
         const access_token = ref<string>()
         const navMenu = ref<[]>()
+        const tokenFlag = false
         const setToken = (token: string) => {
             access_token.value = token
             sessionStorage.setItem("token", token)
@@ -30,6 +31,7 @@ export const useLoginStore = defineStore(
         }
         const setAsyncRoutestMark = false
         return {
+            tokenFlag,
             navMenu,
             setToken,
             getToken,setNavMenu,getNavMenu,

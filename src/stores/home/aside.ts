@@ -4,7 +4,7 @@ export const asideStore = defineStore(
     'asideStore',
     () => {
         return {
-            currentRoute:'',
+            currentRoute:'/dashboard',
             flag:false,
             headerList:[],
             menuUniqueOpened:false,  // 是否只保持一个子菜单的展开(手风琴)

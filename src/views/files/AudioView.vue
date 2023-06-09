@@ -34,6 +34,11 @@
                     <span>{{ infoData(scope.row.updated_at) }}</span>
                 </template>
             </el-table-column>
+            <el-table-column prop="updated_at" label="截止日期" align="center" width="90px">
+                <template #default="scope">
+                    <el-button @click="edit(scope.row.id)" type="primary" size="small" icon="Edit">编辑</el-button>
+                </template>
+            </el-table-column>
         </el-table>
         <ModpagingModule
             v-model:page-size="page.pageSize"
@@ -45,7 +50,7 @@
 </template>
 <script lang="ts" setup>
 import {onMounted, reactive, ref} from "vue";
-import {addNav_group, getNav_group} from "@/api/dataKnowledgeapi";
+import {addNav_group, getNav_group, getNav_groupDetails, updataNav_groupDetails} from "@/api/dataKnowledgeapi";
 import {infoData} from '@/utils/infoData'
 import ModpagingModule from "@/components/common/ModpagingModule.vue";
 import AddButton from "@/components/common/AddButton.vue";
@@ -69,7 +74,7 @@ const add = () => {
             }).then(res => {
                 ElMessage({
                     type: 'success',
-                    message: res.data.msg,
+                    message: res.msg,
                 })
                 getList()
             })
@@ -81,6 +86,39 @@ const add = () => {
             })
         })
 
+}
+const edit = (id: number) => {
+    getNav_groupDetails(id).then(res => {
+        console.log(res.data.data)
+        ElMessageBox.prompt('编辑导航目录', '编辑', {
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+            inputPattern: /^.+$| /,
+            inputValue: res.data.data.title,
+            inputErrorMessage: '导航目录不能为空！',
+        })
+            .then(({value}) => {
+                updataNav_groupDetails(id,
+                    {
+                        title: value,
+                        tag: '导航目录',
+                        status: res.data.data.status
+                    }
+                ).then(res => {
+                    ElMessage({
+                        type: 'success',
+                        message: res.msg,
+                    })
+                    getList()
+                })
+            })
+            .catch(() => {
+                ElMessage({
+                    type: 'info',
+                    message: '添加失败',
+                })
+            })
+    })
 }
 const page = reactive({
     page: 1,

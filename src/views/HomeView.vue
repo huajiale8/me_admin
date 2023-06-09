@@ -2,24 +2,21 @@
 import AsideCommon from "@/components/home/aside-common.vue";
 import HeaderCommon from "@/components/home/header-common.vue";
 import {onMounted} from "vue";
-import {useLoginStore} from "@/stores/login";
-import {getRole_menu} from '@/api/login'
-import {addRouteAll} from '@/utils/router'
+import {getFirstRoute} from "@/utils/router";
+import router from "@/router/index";
 import pinia from "@/utils/pinia";
-
-
+import {useLoginStore} from "@/stores/login";
 
 const store = useLoginStore(pinia)
-const getList = ()=>{
-    store.routeReady = false
-    getRole_menu().then(res=>{
-        store.setNavMenu(res.data.data)
-        addRouteAll(res.data.data,"home")
-        store.routeReady = true
-    })
+const init = () => {
+    const firstRoute = getFirstRoute(store.getNavMenu())
+    if (firstRoute) {
+        router.push(firstRoute.path)
+    }
 }
-onMounted(()=>{
-    getList()
+
+onMounted(() => {
+    init()
 })
 </script>
 

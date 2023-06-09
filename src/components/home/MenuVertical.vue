@@ -4,7 +4,9 @@
             <template v-if="menu.children && menu.children.length > 0 && menu.type === 'menu_dir'">
                 <el-sub-menu :index="menu.url" :key="menu.url">
                     <template #title>
-                        <i :class="menu.icon"></i>
+<!--                        <el-icon>-->
+<!--                            <component :is="menu.icon? menus.icon:'ss'"/>-->
+<!--                        </el-icon>-->
                         <span>{{ menu?.title}}</span>
                     </template>
                     <MenuVertical :menus="menu.children"></MenuVertical>
@@ -12,7 +14,6 @@
             </template>
             <template v-else>
                 <el-menu-item :index="menu.url" :key="menu.url" >
-                    <i :class="menu.icon"></i>
                     <span>{{ menu.title}}</span>
                 </el-menu-item>
             </template>

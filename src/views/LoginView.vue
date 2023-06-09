@@ -12,7 +12,7 @@
                     <el-input v-model="ruleForm.phone"/>
                 </el-form-item>
                 <el-form-item label="用户密码" prop="password">
-                    <el-input type="password" v-model="ruleForm.password" />
+                    <el-input type="password" v-model="ruleForm.password"/>
                 </el-form-item>
                 <el-form-item class="css-right">
                     <el-button @click="resetForm(ruleFormRef)">取消</el-button>
@@ -30,6 +30,7 @@ import type {FormInstance, FormRules} from 'element-plus'
 import {getLogin, getRole_menu} from "@/api/login";
 import {useRouter} from "vue-router";
 import {useLoginStore} from '@/stores/login'
+import {addRouteAll} from "@/utils/router";
 
 const router = useRouter()
 const store = useLoginStore()
@@ -55,9 +56,19 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         if (valid) {
             getLogin(ruleForm).then(res => {
                 store.setToken(res.data.data.token)
-                router.push({path: '/'})
+                getList()
+
             })
         }
+    })
+}
+const getList = () => {
+    store.routeReady = false
+    getRole_menu().then(res => {
+        store.setNavMenu(res.data.data)
+        addRouteAll(res.data.data, "home")
+        store.routeReady = true
+        router.push({path: '/'})
     })
 }
 

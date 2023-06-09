@@ -5,6 +5,7 @@ import router from '@/router/index'
 import { ElMessage } from 'element-plus'
 const userStore = useLoginStore(pinia)
 const api = axios.create({
+    baseURL:'https://apis.bald3r.wang',
     timeout: 3000,
     headers: {
         "Content-Type": "application/json"
@@ -18,8 +19,6 @@ api.interceptors.request.use((config)=>{
             const token = userStore.getToken()
             if (token) config.headers.Authorization ='Bearer '+ token.token
         }
-        // console.log(config)
-        // ElMessage.success(config.msg)
         return config
     },
      (error) =>{
@@ -35,6 +34,7 @@ api.interceptors.response.use(res => {
     // 服务器响应发生错误时的处理
     if(err.response.data.code === 403){
         router.push({name:'login'})
+        console.log('1111')
         return ElMessage.error('请重新登录！')
     } else if(err.response.data.code === 401){
         router.push({name:'login'})

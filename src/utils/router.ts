@@ -40,3 +40,23 @@ const addRouteItem = (route: any,parentName:string) => {
         router.addRoute(routeBaseInfo);
     }
 }
+
+
+
+export const getFirstRoute = (routes:any)=>{
+    const routerPaths: string[] = []
+    const routers = router.getRoutes()
+    routers.forEach(item => {
+        if (item.path) routerPaths.push(item.path)
+    })
+    let find: boolean | any = false
+    for (const key in routes) {
+        if (routes[key]?.type != "menu_dir" && routerPaths.indexOf(routes[key].path) !== -1) {
+            return routes[key]
+        } else if (routes[key].children && routes[key].children?.length) {
+            find = getFirstRoute(routes[key].children!)
+            if (find) return find
+        }
+    }
+    return find
+}

@@ -16,6 +16,7 @@
     "ant-design-vue": "^3.2.20",
     "axios": "^1.4.0",
     "element-plus": "^2.3.5",
+    "fs": "^0.0.1-security",
     "node-sass": "^9.0.0",
     "pinia": "^2.0.36",
     "pinia-plugin-persistedstate": "^3.1.0",
