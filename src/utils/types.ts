@@ -20,3 +20,32 @@ export interface Nav_groupType{
     tag: string;
     title: string;
 }
+
+export interface PageType{
+    page: number;
+    pageSize: number;
+}
+
+export interface AddNav_item{
+    group_id: number;
+    status: number;
+    title: string;
+    url: string;
+    tag: string;
+}
+
+export interface AddUser{
+    name:string;
+    phone:string;
+    password:string;
+    avatar:string;
+    status:number;
+}
+export interface AddGroup{
+    title:string;
+    rules:string[]
+    status:number;
+}
+
+
+

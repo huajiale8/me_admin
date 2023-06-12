@@ -62,7 +62,7 @@
                         :disable="disable"/>
                 </template>
             </el-table-column>
-            <el-table-column prop="updated_at" label="截止日期" align="center" width="170px">
+            <el-table-column prop="updated_at" label="操作" align="center" width="170px">
                 <template #default="scope">
                     <el-row class="mb-4">
                         <el-button type="warning" size="small" icon="Plus" @click="smallAdd(scope.row.id)">新增
@@ -137,7 +137,6 @@ onMounted(() => {
 const getList = () => {
     getMenu().then(res => {
         navList.value = res.data.content
-        console.log(res.data.content)
     })
 }
 </script>

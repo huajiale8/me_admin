@@ -1,7 +1,5 @@
 import api from './request'
 
-
-
 export const getLogin = (params:any) => api({
     url: '/api/v1/login', // 请求地址
     method: 'post', // 请求方式

@@ -38,7 +38,6 @@ const store = asideStore(pinia)
 const store1 = useLoginStore(pinia)
 
 onMounted(() => {
-    console.log(store1.getNavMenu())
     currentRouteActive(route)
 })
 const currentRouteActive = (currentRoute: any) => {

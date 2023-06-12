@@ -34,7 +34,7 @@
                     <span>{{ infoData(scope.row.updated_at) }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="updated_at" label="截止日期" align="center" width="90px">
+            <el-table-column prop="updated_at" label="操作" align="center" width="90px">
                 <template #default="scope">
                     <el-button @click="edit(scope.row.id)" type="primary" size="small" icon="Edit">编辑</el-button>
                 </template>

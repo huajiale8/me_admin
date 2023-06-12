@@ -5,23 +5,13 @@
                 <AddButton @click="add"/>
             </el-col>
         </el-row>
-        <el-table
-            border
-            :data="navList"
-        >
+        <el-table border :data="navList">
             <el-table-column prop="id" label="id" align="center"/>
             <el-table-column prop="title" label="名称" align="center"/>
             <el-table-column prop="status" label="状态" align="center">
                 <template #default="scope">
-                    <el-tag v-if="scope.row.status === 1" class="ml-2" type="success">启用💕</el-tag>
+                    <el-tag v-if="scope.row.status === 0" class="ml-2" type="success">启用💕</el-tag>
                     <el-tag v-else class="ml-2" type="danger">禁用🖤</el-tag>
-                </template>
-            </el-table-column>
-            <el-table-column prop="url" label="url" align="center"/>
-            <el-table-column prop="tag" label="标签" align="center">
-                <template #default="scope">
-                    <el-tag v-if="scope.row.tag === '导航菜单'" type="warning">导航菜单🐇🐇</el-tag>
-                    <el-tag v-if="scope.row.tag === 'button'">页面按钮</el-tag>
                 </template>
             </el-table-column>
             <el-table-column prop="created_at" label="开始日期" align="center">
@@ -45,7 +35,6 @@
             v-model:page="page.page"
             :total="total"
             @render="getList"/>
-
         <el-dialog
             v-model="centerDialogVisible"
             :title="title"
@@ -57,14 +46,24 @@
             <el-form
                 ref="ruleFormRef"
                 :model="ruleForm"
-                status-icon
                 :rules="rules"
                 label-width="120px">
-                <el-form-item label="导航名称" prop="title">
-                    <el-input v-model="ruleForm.title" />
+                <el-form-item label="权限组名称" prop="name">
+                    <el-input v-model="ruleForm.name"/>
                 </el-form-item>
-                <el-form-item label="导航地址" prop="url">
-                    <el-input v-model="ruleForm.url"/>
+                <el-form-item label="权限菜单 :">
+                    <el-tree
+                        prop="validator"
+                        :data='type'
+                        node-key="id"
+                        :default-checked-keys="accesses"
+                        ref="treeRef"
+                        show-checkbox
+                        :props="defaultProps"
+                        :expand-on-click-node="true"
+                        :check-strictly="true"
+                        @check-change="handleCheckChange">
+                    </el-tree>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -72,7 +71,7 @@
                     <el-button @click="centerDialogVisible = false">取消</el-button>
                     <el-button v-if="buttonFlag === true" type="primary" @click="submitForm(ruleFormRef)">确定
                     </el-button>
-                    <el-button v-else type="primary" @click="updata">更新
+                    <el-button v-else type="primary" @click="updata(ruleFormRef)">更新
                     </el-button>
                 </span>
             </template>
@@ -84,49 +83,66 @@ import {onMounted, reactive, ref} from "vue";
 import {infoData} from '@/utils/infoData'
 import ModpagingModule from "@/components/common/ModpagingModule.vue";
 import AddButton from "@/components/common/AddButton.vue";
-import {addNav_item, getNav_itemDetails, getNav_itemList, putNav_itemDetails} from "@/api/dataNavMenu";
 import type {FormInstance, FormRules} from 'element-plus'
-import {ElMessage} from 'element-plus'
+import {ElForm, ElMessage, ElTree} from 'element-plus'
+import {addGroup, getGroupDetail, getGroupList, getRule_treeList, putGroupDetails} from "@/api/admin/group";
+
+const treeRef = ref<InstanceType<typeof ElTree>>()
+const defaultProps = ref({
+    children: 'children',
+    label: 'title'
+})
 
 const total = ref(0)
 const navList = ref([])
+const accesses: any = ref([])
+const type = ref([])
 const centerDialogVisible = ref(false)
 const buttonFlag = ref(false)
 const title = ref('')
 const add = () => {
     centerDialogVisible.value = true
     buttonFlag.value = true
-    title.value = '新增导航菜单'
+    title.value = '新增权限组'
 }
 const page = reactive({
     page: 1,
     pageSize: 10
 })
+const handleCheckChange = () => {
+    accesses.value = treeRef.value!.getCheckedKeys()
+}
 onMounted(() => {
     getList()
+    getRule()
 })
+const getRule = () => {
+    getRule_treeList().then(res => {
+        type.value = res.data.data
+        console.log(res.data.data)
+    })
+}
 const getList = () => {
-    getNav_itemList(page).then(res => {
-        navList.value = res.data.data.list
+    getGroupList(page).then(res => {
+        navList.value = res.data.data.data
         total.value = res.data.data.total
     })
 }
 const ruleFormRef = ref<FormInstance>()
 let ruleForm = reactive({
-    title: '',
-    url: '',
+    name: '',
     id: 0,
-    tag: '导航菜单',
-    group_id: 0,
-    status: 0
+    status: 0,
 })
 
 const rules = reactive<FormRules>({
-    title: [
-        {required: true, message: '请输入菜单名称', trigger: 'blur'},
+    name: [
+        {required: true, message: '请输入管理员名称', trigger: 'blur'},
     ],
-    url: [
-        {required: true, message: '请输入菜单地址', trigger: 'blur'},
+    phone: [
+        {required: true, message: '请输入管理员电话', trigger: 'blur'},
+        {pattern: /^1[3456789]\d{9}$/, message: '手机号码格式不正确', trigger: 'blur'}
+
     ],
 })
 
@@ -134,14 +150,15 @@ const submitForm = (formEl: FormInstance | undefined) => {
     if (!formEl) return
     formEl.validate((valid) => {
         if (valid) {
-            addNav_item(ruleForm).then(res => {
+            addGroup({
+                title: ruleForm.name,
+                rules: JSON.stringify(accesses.value),
+                status: ruleForm.status
+            }).then(res => {
                 ElMessage({
                     type: 'success',
                     message: res.msg,
                 })
-                ruleForm.title = ''
-                ruleForm.url = ''
-                ruleForm.group_id = 0
                 centerDialogVisible.value = false
                 buttonFlag.value = false
                 getList()
@@ -152,34 +169,46 @@ const submitForm = (formEl: FormInstance | undefined) => {
     })
 }
 const edit = (id: number) => {
-    title.value = '编辑导航菜单'
-    getNav_itemDetails(id).then(res => {
+    title.value = '编辑权限组信息'
+    getGroupDetail(id).then(res => {
+        let rules = res.data.data.rules.split(",")
         let s = res.data.data
-        ruleForm.title = s.title
-        ruleForm.url = s.url
-        ruleForm.id = s.id
-        ruleForm.group_id = s.group_id
+        console.log(s)
+        ruleForm.name = s.title
         ruleForm.status = s.status
+        ruleForm.id = s.id
+        accesses.value = rules.map(Number)
         centerDialogVisible.value = true
         buttonFlag.value = false
     })
 }
-const updata = () => {
-    putNav_itemDetails(ruleForm.id,ruleForm).then(res=>{
-        centerDialogVisible.value = false
-        buttonFlag.value= false
-        getList()
+const updata = (formEl: FormInstance | undefined) => {
+    if (!formEl) return
+    formEl.validate((valid) => {
+        if (valid) {
+            putGroupDetails(ruleForm.id,
+                {
+                    title: ruleForm.name,
+                    status: ruleForm.status,
+                    rules: JSON.stringify(accesses.value),
+                }).then(res => {
+                centerDialogVisible.value = false
+                buttonFlag.value = false
+                getList()
+            })
+        } else {
+            return false
+        }
     })
 }
+
 const close = () => {
     centerDialogVisible.value = false
     buttonFlag.value = false
-    ruleForm.title = ''
-    ruleForm.url = ''
-    ruleForm.tag = '导航菜单'
     ruleForm.id = 0
-    ruleForm.group_id = 0
+    ruleForm.name = ''
     ruleForm.status = 0
+    accesses.value = []
 }
 </script>
 
